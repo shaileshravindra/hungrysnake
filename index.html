@@ -1,0 +1,567 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<link href="https://fonts.googleapis.com/css2?family=Nerko+One&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" integrity="sha512-PgQMlq+nqFLV4ylk1gwUOgm6CtIIXkKwaIHp/PAIWHzig/lKZSEGKEysh0TCVbHJXCLN7WetD8TFecIky75ZfQ==" crossorigin="anonymous" />
+	
+	<title>snake game</title>
+	
+	<style type="text/css">
+		
+		*{
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		#canvas {
+
+			background: black;
+			border: 3px solid white;
+
+
+		}
+
+		html {
+			font-size: 62.5%;
+			height: 100%;
+			font-family: 'Nerko One', cursive;
+		}
+
+		body{
+
+			background-image: linear-gradient(to bottom, #051937, #003d5a, #006368, #358663, #8ea45c);
+			background-size: cover;
+  			height: 100%;
+
+		}
+
+		.main_div {
+
+			display: grid;
+			place-items: center;
+			text-align: center;
+
+
+		}
+
+		.title_screen{
+
+			color: white;
+			text-align: center;
+			font-size: 55px;
+			font-family: 'Nerko One', cursive;
+			margin-bottom: 0;
+			
+		}
+
+		.fa-apple-alt  {
+
+
+			animation: pop 3s linear infinite ;
+		}
+
+
+		
+		.scores  {
+
+
+			margin-top: 40px;
+			color: white;
+			font-size: 50px;
+			width: 100%;
+			font-family: 'Nerko One', cursive;
+			display: flex;
+			justify-content: space-evenly;
+
+
+		}
+
+
+		.direction {
+
+			margin-top: 100px;
+			text-align: center;
+		}
+
+		#left , #right{
+
+			padding: 20px;
+			
+		}
+
+		#up:active, #down:active, #left:active, #right:active, #restart:active {
+
+			cursor: pointer;
+			transform: translateY(4px);
+
+		}
+
+		#play{
+
+			animation:
+		}
+
+
+		@keyframes pop {
+
+			0%{
+
+				transform: scale(0.9);
+			}
+
+			100% {
+
+				transform: scale(1.3);
+			}
+
+		}
+
+		@keyframes bob {
+
+		0%{
+
+			transform: scale(0.9);
+		}
+
+		100% {
+
+			transform: scale(1.3);
+		}
+	}
+
+		
+
+
+
+
+
+
+
+
+
+
+
+
+	</style>
+</head>
+
+<body>
+
+
+<div class="main_div">
+	<div class ="title_screen">
+		Hungry Snake 
+	</div>
+		
+</div>
+<div class="scores">
+	<p id="highScore">Highscore: 0</p>
+	<p><i class='fas fa-apple-alt' style='color:red'></i> :  <span id="score">0</span></p>
+	<p><i class='fas fa-redo-alt' style='color:white' onclick="restart()" id="restart"></i></p>
+	<p  id="play" value="play" onclick="play()"><i class="fa fa-pause"></i></p>
+</div>
+<div style="text-align: center">
+	<canvas id="canvas" width="900" height="900"></canvas>
+</div>
+	<div class="direction">
+	<i class='fas fa-caret-square-up' id ="up" style='font-size:150px;color:white' onclick="funcUp()"></i><br>
+	<i class='fas fa-caret-square-left' id= "left" style='font-size:150px;color:white' onclick="funcLft()"></i>
+	<i class='fas fa-caret-square-down' id="down" style='font-size:150px;color:white' onclick="funcDwn()"></i>
+	<i class='fas fa-caret-square-right' id= "right" style='font-size:150px;color:white' onclick="funcRgt()"></i>
+</div>
+
+ 	
+<script>
+	const cvs = document.getElementById("canvas");
+	const ctx = cvs.getContext("2d");
+	let interval = 150;
+	let box=15;
+	let dir,game;
+	let rest= "false";
+	let counter1,counter2,counter3,counter4,counter5 = 0;
+	let score = 0;
+	let dead = new Audio();
+	let eat = new Audio();
+	let up = new Audio();
+	let right = new Audio();
+	let left = new Audio();
+	let down = new Audio();
+
+	dead.src = "audio/dead.mp3";
+	eat.src = "audio/eat.mp3";
+	up.src = "audio/up.mp3";
+	right.src = "audio/right.mp3";
+	left.src = "audio/left.mp3";
+	down.src = "audio/down.mp3";
+
+	localStorage.removeItem("highScore");
+	document.getElementById("highScore").innerHTML = "Highscore"+""+":" + 0;
+
+	function drawSnake(x,y) {
+
+		ctx.fillStyle = "white";
+		ctx.fillRect(x*box,y*box,box,box);
+		ctx.fillStyle = "black";
+		ctx.strokeRect(x*box,y*box,box,box);
+	}
+
+
+	function drawFood(x,y) {
+
+		ctx.fillStyle = "red";
+		ctx.fillRect(x*box,y*box,box,box);
+		ctx.fillStyle = "black";
+		ctx.strokeRect(x*box,y*box,box,box);
+	}
+
+
+	function funcUp() {
+
+			up.play();
+			dir="up";
+
+	}
+
+
+	function funcDwn() {
+
+			down.play();
+			dir="down";
+
+	}
+
+
+	function funcRgt() {
+
+			right.play();
+			dir="right";
+
+	}
+
+
+	function funcLft() {
+
+			left.play();
+			dir="left";
+
+	}
+
+	function restart() {
+		
+		dir="";
+		let count=0;
+		rest ="false";
+		var len = 1;
+		interval = 150;
+		counter = 0;
+		snake = [];
+
+		for(var i=len - 1;i >= 0;i--){
+
+				snake.push({
+
+					x:i,
+					y:0
+
+				})
+		}
+
+		game = setInterval(draw,interval);
+
+
+
+}
+
+
+//create snake
+var len = 1;
+snake = [];
+
+for(var i=len - 1;i >= 0;i--){
+
+	snake.push({
+
+		x:i,
+		y:0
+
+	})
+
+} 
+
+
+
+function play() {
+
+var button = document.getElementById("play");
+
+//this should be initialised only one time 
+	if(counter5 == 0){
+		button.value = "play"; 
+		counter5++;
+	}
+
+	let bob = "false";
+
+
+	if (button.value =="play" && rest == "false") {
+
+ 	button.value = "pause";
+	button.style.animation = "bob 2s linear infinite ";
+	ctx.fillStyle = "white";
+	ctx.font = "80px Comic Sans MS";
+	ctx.textAlign = "center";
+	ctx.fillText("Paused", cvs.width/2, cvs.height/2);
+	bob ="true";
+	clearInterval(game); 
+
+	}
+
+	if(button.value == "pause" && rest == "false" && bob == "false") {
+	
+		button.value = "play";
+		clearInterval(game);
+		button.style.animation = "none";
+		game = setInterval(draw,interval);
+
+	}
+
+
+}
+
+
+
+function draw () {
+
+ctx.clearRect(0,0,cvs.width,cvs.height);
+let score = (snake.length -1);
+document.getElementById("score").innerHTML = score;
+
+//function for high score
+
+if(localStorage.highScore){
+		if(score>localStorage.highScore){
+				localStorage.highScore = score;
+		}
+	}
+
+	else{
+		localStorage.setItem("highScore", score);
+	}
+	
+		document.getElementById("highScore").innerHTML = "Highscore: " + localStorage.highScore;
+	
+
+	for(var i=0;i<snake.length;i++) {
+
+		var snakeX =snake[i].x;
+		var snakeY =snake[i].y;
+
+		drawSnake(snakeX,snakeY)
+	}
+
+
+drawFood(food.x,food.y)
+// Snake Head
+
+var snakeX = snake[0].x;
+var snakeY = snake[0].y;
+
+
+// to move the snake with key press
+if(dir ==  "right" ) {
+
+	snakeX++
+}
+
+else if (dir == "left" ) {
+
+	snakeX--
+}
+
+else if (dir == "up" ) {
+
+	snakeY--
+}
+
+else if (dir == "down" ){
+
+	snakeY++
+}
+
+// what happens after the snake gets the food 
+if(snakeX == food.x && snakeY == food.y) {
+
+	eat.play();
+	score++;
+
+	food = {
+
+    	x:Math.round(Math.random()* 58) + 1,
+    	y:Math.round(Math.random()* 58) + 1
+    }
+
+}
+    else {
+    	
+    	snake.pop();
+
+    }
+
+
+ 	var newHead = {
+
+			x:snakeX,
+			y:snakeY
+		}
+
+
+
+
+if(newHead.x < 0 || newHead.y < 0 || newHead.x >= (cvs.width/box) || newHead.y >= (cvs.height/box)|| collision(newHead,snake)) {
+
+	
+		clearInterval(game);
+		score =((snake.length)-1);
+		ctx.fillStyle = "white";
+		ctx.font = "80px Comic Sans MS";
+		ctx.textAlign = "center";
+		ctx.fillText("GAME OVER", cvs.width/2, cvs.height/2);
+		rest ="true";
+		dead.play();
+	}
+
+//as the new value goes to the bottom and we want the new value to be on top i.e grown forward not backward
+snake.unshift(newHead);
+
+	if(score >= 9 && score <= 18 && collision(newHead,snake) != false){
+
+		interval = 65 ;
+		counter1++;
+
+	}
+
+	if(score > 18 && score <= 27 && collision(newHead,snake) != false){
+
+		interval = 55 ;
+		counter2++;
+
+	}
+
+	if(score > 27 && score <= 35 && collision(newHead,snake) != false){
+
+		interval = 45 ;
+		counter3++;
+
+	}
+
+	if(score > 35 && collision(newHead,snake) != false){
+
+		interval = 40 ;
+		counter4++;
+
+	}
+
+	if (counter1 == 1){
+
+		clearInterval(game);
+		game = setInterval(draw,interval);
+		
+	}
+
+	if (counter2 == 1){
+
+		clearInterval(game);
+		game = setInterval(draw,interval);
+
+	}
+
+	if (counter3 == 1){
+
+		clearInterval(game);
+		game = setInterval(draw,interval);
+
+	}
+
+	if (counter4 == 1){
+
+		clearInterval(game);
+		game = setInterval(draw,interval);
+
+}
+
+
+}
+
+
+// cheack collision function
+function collision(head,array){
+    for(let i = 0; i < array.length; i++){
+        if(head.x == array[i].x && head.y == array[i].y){
+            return true;
+        }
+    }
+    return false;
+}
+
+// key direction for keyboard
+document.addEventListener("keydown",keyPush);
+
+	function keyPush(evt) {
+  
+		if(evt.keyCode == 37 && dir != "right") {
+
+			left.play();
+			dir="left";
+
+		}
+		
+		else if (evt.keyCode == 38 && dir != "down") {
+
+			up.play();
+			dir="up";
+		}
+
+		else if (evt.keyCode == 39 && dir != "left") {
+
+			right.play();
+			dir="right";
+		}
+
+		else if (evt.keyCode == 40 && dir != "up") {
+
+			down.play();
+			dir="down";
+
+		}
+
+    }
+
+    //food for the snake
+
+    var food = {
+
+    	x:Math.round(Math.random()* 58) + 1,
+    	y:Math.round(Math.random()* 58) + 1
+    }
+
+   
+	
+
+	  game = setInterval(draw,interval);
+
+
+
+
+
+
+</script>
+
+
+</body>
+
+</html>
+
+
