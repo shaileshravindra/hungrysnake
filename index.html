@@ -92,11 +92,16 @@
 			
 		}
 
-		#up:active, #down:active, #left:active, #right:active, #restart:active {
+		#up, #down, #left, #right {
 
 			cursor: pointer;
-			transform: translateY(4px);
 
+		}
+
+		#restart:active {
+
+			cursor: pointer;
+			transform: translateY(4px);	
 		}
 
 		#play{
@@ -177,25 +182,18 @@
 <script>
 	const cvs = document.getElementById("canvas");
 	const ctx = cvs.getContext("2d");
-	let interval = 150;
+	let interval = 160;
 	let box=15;
 	let dir,game;
 	let rest= "false";
 	let counter1,counter2,counter3,counter4,counter5 = 0;
-	let score = 0;
 	let dead = new Audio();
 	let eat = new Audio();
-	let up = new Audio();
-	let right = new Audio();
-	let left = new Audio();
-	let down = new Audio();
+
 
 	dead.src = "audio/dead.mp3";
 	eat.src = "audio/eat.mp3";
-	up.src = "audio/up.mp3";
-	right.src = "audio/right.mp3";
-	left.src = "audio/left.mp3";
-	down.src = "audio/down.mp3";
+
 
 	localStorage.removeItem("highScore");
 	document.getElementById("highScore").innerHTML = "Highscore"+""+":" + 0;
@@ -220,42 +218,41 @@
 
 	function funcUp() {
 
-			up.play();
-			dir="up";
+			if(dir != "down"){
+			dir="up";}
 
 	}
 
 
 	function funcDwn() {
 
-			down.play();
-			dir="down";
+		if(dir != "up"){
+			dir="down";}
 
 	}
 
 
 	function funcRgt() {
 
-			right.play();
-			dir="right";
+		if(dir != "left"){
+			dir="right";}
 
 	}
 
 
 	function funcLft() {
 
-			left.play();
-			dir="left";
+		if(dir != "right"){
+			dir="left";}
 
 	}
 
 	function restart() {
 		
 		dir="";
-		let count=0;
 		rest ="false";
 		var len = 1;
-		interval = 150;
+		interval = 160;
 		counter = 0;
 		snake = [];
 
@@ -371,31 +368,30 @@ var snakeY = snake[0].y;
 
 
 // to move the snake with key press
-if(dir ==  "right" ) {
+if(dir ==  "right" && dir != "left") {
 
-	snakeX++
+	snakeX++;
 }
 
-else if (dir == "left" ) {
+else if (dir == "left" && dir != "right" ) {
 
-	snakeX--
+	snakeX--;
 }
 
-else if (dir == "up" ) {
+else if (dir == "up" && dir != "down") {
 
-	snakeY--
+	snakeY--;
 }
 
-else if (dir == "down" ){
+else if (dir == "down" && dir != "up"){
 
-	snakeY++
+	snakeY++;
 }
 
 // what happens after the snake gets the food 
 if(snakeX == food.x && snakeY == food.y) {
 
 	eat.play();
-	score++;
 
 	food = {
 
@@ -513,26 +509,26 @@ document.addEventListener("keydown",keyPush);
   
 		if(evt.keyCode == 37 && dir != "right") {
 
-			left.play();
+	
 			dir="left";
 
 		}
 		
 		else if (evt.keyCode == 38 && dir != "down") {
 
-			up.play();
+		
 			dir="up";
 		}
 
 		else if (evt.keyCode == 39 && dir != "left") {
 
-			right.play();
+		
 			dir="right";
 		}
 
 		else if (evt.keyCode == 40 && dir != "up") {
 
-			down.play();
+		
 			dir="down";
 
 		}
